@@ -44,12 +44,11 @@ void play(int starting_index){
 
         if (index_of_music < starting_index){
             std::cout << index_of_music << std::endl;
-            it++;
             index_of_music++;
             return;
         }
         passed_duration=0;
-        //Mix_FreeMusic(music);
+        Mix_FreeMusic(music);
 
         const char*music_file=&*it->c_str();
         std::cout << music_file << std::endl;
