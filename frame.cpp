@@ -87,6 +87,8 @@ void Frame::timer_event(wxTimerEvent &event){
     }
     if (Mix_PlayingMusic() && passed_duration==0){
         // if music begin
+        //
+        // change the starting index
         song_index_played=0;
         cout << total_duration << endl;
         music_duration->SetMax(total_duration);
