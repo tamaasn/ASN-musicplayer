@@ -8,7 +8,6 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <thread>
 
 Mix_Music *music=NULL;
 int highest_music_id=0;
