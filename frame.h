@@ -19,8 +19,8 @@ class Frame: public wxFrame{
         void change_duration(wxCommandEvent &event);
         void stop_music(wxCommandEvent &event);
         void pause_music(wxCommandEvent &event);
+        
         string get_duration(uint64_t time);
-
         string split_string(string text); 
 
         wxButton *open_button;
@@ -35,8 +35,9 @@ class Frame: public wxFrame{
         wxStaticText *label;
         wxStaticText *passed_duration_label;
         wxStaticText *duration_label;
-        bool changing_duration=false;
 
+        bool changing_duration=false;
+        
         int list_index=0;
         int song_index_played;
         int play_id=1;
