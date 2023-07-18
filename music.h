@@ -42,7 +42,6 @@ void play(int starting_index){
 
 
         if (index_of_music < starting_index){
-            std::cout << index_of_music << std::endl;
             index_of_music++;
             return;
         }
