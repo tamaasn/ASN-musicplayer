@@ -29,13 +29,13 @@ void init(){
 }
 
 void play(int starting_index){
+    std::cout << starting_index << std::endl;
     if (!Mix_PlayingMusic() && is_playing && !paused){
         it = musics.begin()+index_of_music;
         std::cout << starting_index << std::endl;
 
         if (it==it_end){
             std::cout << "Ended\n";
-            is_playing=false;
             index_of_music=0;
             return;
         }
@@ -47,6 +47,7 @@ void play(int starting_index){
             index_of_music++;
             return;
         }
+
         passed_duration=0;
         Mix_FreeMusic(music);
 

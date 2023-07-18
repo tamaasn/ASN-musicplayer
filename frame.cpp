@@ -1,25 +1,26 @@
 #include "frame.h"
 #include <string>
+#include <unistd.h>
 
 
-Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(540,350)){
+Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(345,350)){
     wxLogMessage("Welcome");
     wxPanel *panel = new wxPanel(this , -1);
-
+    nice(0);
     open_button = new wxButton(panel , open_id , _T("Open") , wxPoint(0,5) , wxSize(60,30));
     play_button = new wxButton(panel , play_id, _T("Play") , wxPoint(60,5) , wxSize(60,30));
     stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(120,5) , wxSize(60,30));
-    delete_button = new wxButton(panel , delete_id , _T("Delete") , wxPoint(60,35) , wxSize(60,30));
-    pause_button = new wxButton(panel , pause_id , _T("Pause") , wxPoint(0,35),wxSize(60,30));
-    slider = new wxSlider(panel , slider_id , 0,0,100,wxPoint(50,230),wxSize(200,40));
+    delete_button = new wxButton(panel , delete_id , _T("Delete") , wxPoint(180,5) , wxSize(60,30));
+    pause_button = new wxButton(panel , pause_id , _T("Pause") , wxPoint(240,5),wxSize(60,30));
+    slider = new wxSlider(panel , slider_id , 0,0,100,wxPoint(40,230),wxSize(200,40));
     slider->SetValue(50);
-    music_duration = new wxSlider(panel , duration_id,0,0,0,wxPoint(50,280),wxSize(200,40));
-    list_song = new wxListBox(panel , list_id , wxPoint(180,5) , wxSize(340,200));
+    music_duration = new wxSlider(panel , duration_id,0,0,0,wxPoint(40,280),wxSize(200,40));
+    list_song = new wxListBox(panel , list_id , wxPoint(0,35) , wxSize(340,200));
 
-    label = new wxStaticText(panel , label_id, _T("Volume : ") , wxPoint(10,240) , wxSize(50,50));
+    label = new wxStaticText(panel , label_id, _T("Volume : ") , wxPoint(0,240) , wxSize(50,50));
     timer = new wxTimer(this,timer_id);
-    passed_duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(10,290),wxSize(60,50));
-    duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(250,290) , wxSize(60,50));
+    passed_duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(0,290),wxSize(60,50));
+    duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(240,290) , wxSize(60,50));
     Bind(wxEVT_BUTTON , &Frame::play_music , this , play_id);
     Bind(wxEVT_SLIDER , &Frame::SliderGetValue , this , slider_id);
     Bind(wxEVT_SLIDER , &Frame::change_duration , this , duration_id);
@@ -30,7 +31,7 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     Bind(wxEVT_BUTTON , &Frame::pause_music , this , pause_id);
     init();
 }
-
+// turn duration into format "hour:minute:second"
 string Frame::get_duration(uint64_t time){
     if (time == 0){
         return "0:0:0";
@@ -49,7 +50,7 @@ string Frame::get_duration(uint64_t time){
     string time_str= string(data);
     return time_str;
 }
-
+// pause music
 void Frame::pause_music(wxCommandEvent &event){
     if (Mix_PausedMusic() == 1){
         paused=false;
@@ -81,8 +82,12 @@ void Frame::change_duration(wxCommandEvent &event){
 
 void Frame::timer_event(wxTimerEvent &event){
     cout << "Timer on\n";
-    play(song_index_played);
+    if (!Mix_PlayingMusic() && is_playing){
+        play(song_index_played);
+    }
     if (Mix_PlayingMusic() && passed_duration==0){
+        // if music begin
+        song_index_played=0;
         cout << total_duration << endl;
         music_duration->SetMax(total_duration);
         list_song->SetSelection(index_of_music-1);
@@ -90,21 +95,27 @@ void Frame::timer_event(wxTimerEvent &event){
     }
     if (is_playing){
         if (!changing_duration){
-            if (passed_duration++ >= total_duration){
+            
+            if(passed_duration++ >= total_duration){
                 passed_duration=0;
             }
         }
+
         else{
+            // if duration is changing change the duration
             passed_duration=music_duration->GetValue();
             change_music_duration(passed_duration);
             changing_duration=false;
         }
+        
         music_duration->SetValue(passed_duration);
         passed_duration_label->SetLabel(get_duration(passed_duration));
-    }else{
+    }
+    else{
+        song_index_played=0;
         timer->Stop();
         music_duration->SetValue(0);
-        passed_duration_label->SetLabel("0:0:0");
+        passed_duration_label->SetLabel("0:0:0");;
     }
 }
 
@@ -133,6 +144,7 @@ void Frame::play_music(wxCommandEvent &event){
     pause_button->SetLabel("Pause");
     is_playing=true;
     paused=false;
+    play(song_index_played);
     timer->Start(1000);
 }
 
