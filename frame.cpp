@@ -1,7 +1,4 @@
 #include "frame.h"
-#include <string>
-#include <unistd.h>
-
 
 Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(345,350)){
     wxLogMessage("Welcome");
@@ -124,7 +121,7 @@ void Frame::timer_event(wxTimerEvent &event){
 
 
 void Frame::SliderGetValue(wxCommandEvent &event){
-    std::cout << slider->GetValue() << std::endl;
+    cout << slider->GetValue() << endl;
     change_volume(slider->GetValue());
 }
 
@@ -160,7 +157,7 @@ void Frame::open_file(wxCommandEvent &event){
     list_song->Append(filename.GetFilename());
     list_index++;
     cout <<"File: " << filename.GetPath().utf8_str() << endl;
-    add_queue(std::string(filename.GetPath().utf8_str()));
+    add_queue(string(filename.GetPath().utf8_str()));
 }
 
 void Frame::delete_file(wxCommandEvent &event){
