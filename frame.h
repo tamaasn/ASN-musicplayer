@@ -1,9 +1,6 @@
 #include <wx/wx.h>
 #include <wx/slider.h>
-#include <string>
 #include "music.h"
-#include <thread>
-#include <iostream>
 
 using namespace std;
 
