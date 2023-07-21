@@ -1,6 +1,6 @@
 compile:
-	clang++ frame.cpp main.cpp `wx-config --libs --cxxflags` -o program -lSDL2 -lSDL2_mixer
+	clang++ frame.cpp main.cpp `wx-config --libs --cxxflags` -o musicplayer -lSDL2 -lSDL2_mixer
 run:
-	./program
+	./musicplayer
 clean:
-	rm -rf program
+	rm -rf musicplayer
