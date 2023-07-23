@@ -9,15 +9,15 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(120,5) , wxSize(60,30));
     delete_button = new wxButton(panel , delete_id , _T("Delete") , wxPoint(180,5) , wxSize(60,30));
     pause_button = new wxButton(panel , pause_id , _T("Pause") , wxPoint(240,5),wxSize(60,30));
-    slider = new wxSlider(panel , slider_id , 0,0,100,wxPoint(40,230),wxSize(200,40));
+    slider = new wxSlider(panel , slider_id , 0,0,100,wxPoint(60,230),wxSize(200,40));
     slider->SetValue(50);
-    music_duration = new wxSlider(panel , duration_id,0,0,0,wxPoint(40,280),wxSize(200,40));
+    music_duration = new wxSlider(panel , duration_id,0,0,0,wxPoint(60,280),wxSize(200,40));
     list_song = new wxListBox(panel , list_id , wxPoint(0,35) , wxSize(340,200));
 
     label = new wxStaticText(panel , label_id, _T("Volume : ") , wxPoint(0,240) , wxSize(50,50));
     timer = new wxTimer(this,timer_id);
     passed_duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(0,290),wxSize(60,50));
-    duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(240,290) , wxSize(60,50));
+    duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(260,290) , wxSize(60,50));
     Bind(wxEVT_BUTTON , &Frame::play_music , this , play_id);
     Bind(wxEVT_SLIDER , &Frame::SliderGetValue , this , slider_id);
     Bind(wxEVT_SLIDER , &Frame::change_duration , this , duration_id);
