@@ -28,7 +28,7 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     Bind(wxEVT_BUTTON , &Frame::pause_music , this , pause_id);
     init();
 }
-// turn duration into format "hour:minute:second"
+// turn duration into format "hour:minute:second"   
 string Frame::get_duration(uint64_t time){
     if (time == 0){
         return "0:0:0";
