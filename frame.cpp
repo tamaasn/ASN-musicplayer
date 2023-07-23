@@ -24,7 +24,9 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     Bind(wxEVT_TIMER , &Frame::timer_event , this , timer_id);
     Bind(wxEVT_BUTTON , &Frame::stop_music , this , stop_id);
     Bind(wxEVT_BUTTON , &Frame::pause_music , this , pause_id);
+
     this->SetMaxSize(wxSize(345,350));
+    this->SetMinSize(wxSize(345,350));
 
     init();
 }
@@ -149,10 +151,11 @@ void Frame::play_music(wxCommandEvent &event){
 
 void Frame::open_file(wxCommandEvent &event){
     wxFileDialog filename(this,_("Select music"),"","","",wxFD_OPEN|wxFD_FILE_MUST_EXIST);
-
+    filename.SetDirectory(filedir);
     if (filename.ShowModal()==wxID_CANCEL){
         return;
     }
+    filedir=filename.GetDirectory().utf8_str();
 
     list_song->Append(filename.GetFilename());
     list_index++;

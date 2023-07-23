@@ -35,6 +35,8 @@ class Frame: public wxFrame{
 
         bool changing_duration=false;
         
+        string filedir="/";
+
         int list_index=0;
         int song_index_played;
         int play_id=1;
