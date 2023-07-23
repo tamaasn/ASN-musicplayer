@@ -1,9 +1,7 @@
 #include "frame.h"
 
 Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(345,350)){
-    wxLogMessage("Welcome");
     wxPanel *panel = new wxPanel(this , -1);
-    nice(0);
     open_button = new wxButton(panel , open_id , _T("Open") , wxPoint(0,5) , wxSize(60,30));
     play_button = new wxButton(panel , play_id, _T("Play") , wxPoint(60,5) , wxSize(60,30));
     stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(120,5) , wxSize(60,30));
@@ -26,6 +24,8 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     Bind(wxEVT_TIMER , &Frame::timer_event , this , timer_id);
     Bind(wxEVT_BUTTON , &Frame::stop_music , this , stop_id);
     Bind(wxEVT_BUTTON , &Frame::pause_music , this , pause_id);
+    this->SetMaxSize(wxSize(345,350));
+
     init();
 }
 // turn duration into format "hour:minute:second"   
