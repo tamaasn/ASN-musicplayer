@@ -1,5 +1,9 @@
 #include <wx/wx.h>
 #include <wx/slider.h>
+#include <vector>
+#include <fstream>
+#include <locale>
+#include <bits/stdc++.h>
 #include "music.h"
 
 using namespace std;
@@ -16,6 +20,8 @@ class Frame: public wxFrame{
         void change_duration(wxCommandEvent &event);
         void stop_music(wxCommandEvent &event);
         void pause_music(wxCommandEvent &event);
+        void open_playlist(wxCommandEvent &event);
+        void save_playlist(wxCommandEvent &event);
         
         string get_duration(uint64_t time);
         string split_string(string text); 
@@ -32,6 +38,9 @@ class Frame: public wxFrame{
         wxStaticText *label;
         wxStaticText *passed_duration_label;
         wxStaticText *duration_label;
+        wxMenuBar *menubar;
+        wxMenu *menufile;
+        wxMenu *menuothers;
 
         bool changing_duration=false;
         
@@ -49,5 +58,7 @@ class Frame: public wxFrame{
         int timer_id=8;
         int duration_id=9;
         int pause_id=10;
+        int open_playlist_id=11;
+        int save_playlist_id=12;
 
 };

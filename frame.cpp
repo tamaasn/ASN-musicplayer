@@ -1,12 +1,12 @@
 #include "frame.h"
 
-Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(345,350)){
+Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(345,370)){
     wxPanel *panel = new wxPanel(this , -1);
-    open_button = new wxButton(panel , open_id , _T("Open") , wxPoint(0,5) , wxSize(60,30));
-    play_button = new wxButton(panel , play_id, _T("Play") , wxPoint(60,5) , wxSize(60,30));
-    stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(120,5) , wxSize(60,30));
-    delete_button = new wxButton(panel , delete_id , _T("Delete") , wxPoint(180,5) , wxSize(60,30));
-    pause_button = new wxButton(panel , pause_id , _T("Pause") , wxPoint(240,5),wxSize(60,30));
+   // open_button = new wxButton(panel , open_id , _T("Open") , wxPoint(0,5) , wxSize(60,30));
+    play_button = new wxButton(panel , play_id, _T("Play") , wxPoint(0,5) , wxSize(60,30));
+    stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(60,5) , wxSize(60,30));
+    delete_button = new wxButton(panel , delete_id , _T("Delete") , wxPoint(120,5) , wxSize(60,30));
+    pause_button = new wxButton(panel , pause_id , _T("Pause") , wxPoint(180,5),wxSize(60,30));
     slider = new wxSlider(panel , slider_id , 0,0,100,wxPoint(60,230),wxSize(200,40));
     slider->SetValue(50);
     music_duration = new wxSlider(panel , duration_id,0,0,0,wxPoint(60,280),wxSize(200,40));
@@ -16,20 +16,70 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     timer = new wxTimer(this,timer_id);
     passed_duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(0,290),wxSize(60,50));
     duration_label = new wxStaticText(panel , wxID_ANY , _T("0:0:0") , wxPoint(260,290) , wxSize(60,50));
-    Bind(wxEVT_BUTTON , &Frame::play_music , this , play_id);
+
+    menufile = new wxMenu;
+    menuothers = new wxMenu;
+
+    menufile->Append(open_id , "Open file\tCtrl-O" , "Open file");
+    menufile->Append(open_playlist_id , "Open playlist\tCtrl-Shift-O" , "Open playlist");
+    menufile->Append(save_playlist_id , "Save playlist\tCtrl-S" , "Save playlist");
+    
+    menuothers->Append(wxID_EXIT , "Exit" , "Exit");
+
+    menubar = new wxMenuBar;
+    menubar->Append(menufile , "&File");
+    menubar->Append(menuothers , "&Others");
+    SetMenuBar(menubar);
+
     Bind(wxEVT_SLIDER , &Frame::SliderGetValue , this , slider_id);
     Bind(wxEVT_SLIDER , &Frame::change_duration , this , duration_id);
-    Bind(wxEVT_BUTTON , &Frame::open_file , this , open_id);
+    Bind(wxEVT_BUTTON , &Frame::play_music , this , play_id);
     Bind(wxEVT_BUTTON , &Frame::delete_file , this , delete_id);  
     Bind(wxEVT_TIMER , &Frame::timer_event , this , timer_id);
     Bind(wxEVT_BUTTON , &Frame::stop_music , this , stop_id);
     Bind(wxEVT_BUTTON , &Frame::pause_music , this , pause_id);
+    Bind(wxEVT_MENU , &Frame::open_file , this , open_id);
+    Bind(wxEVT_MENU , &Frame::open_playlist , this , open_playlist_id);
+    Bind(wxEVT_MENU , &Frame::save_playlist , this , save_playlist_id);
 
-    this->SetMaxSize(wxSize(345,350));
-    this->SetMinSize(wxSize(345,350));
+    this->SetMaxSize(wxSize(345,370));
+    this->SetMinSize(wxSize(345,370));
 
     init();
 }
+
+
+void Frame::save_playlist(wxCommandEvent &event){
+    wxFileDialog filepath(this , _("Save playlist") , "" , "my_playlist.ply" , "Playlist files(*.ply)|*.ply" , wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    if (filepath.ShowModal() == wxID_CANCEL){
+        return;
+    }
+    vector<string>::const_iterator vector_begin;
+    ofstream file;
+    file.open(filepath.GetPath().utf8_str());
+    for (vector_begin=musics.begin(); vector_begin != musics.end(); vector_begin++){
+        file << *vector_begin+"\n";
+    }
+}
+
+
+void Frame::open_playlist(wxCommandEvent &event){
+    wxFileDialog filepath(this , _("Open playlist") , "","","Playlist files (*.ply)|*.ply" , wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (filepath.ShowModal() == wxID_CANCEL){
+        return;
+    }
+    wfstream file(filepath.GetPath().utf8_str());
+    file.imbue(locale(""));
+    wstring files;
+    while (getline(file,files)){
+        wxString filename(files);
+        string str = string(filename.utf8_str());
+        list_song->Append(files);
+        add_queue(str);
+    }
+}
+
+
 // turn duration into format "hour:minute:second"   
 string Frame::get_duration(uint64_t time){
     if (time == 0){
@@ -157,7 +207,7 @@ void Frame::open_file(wxCommandEvent &event){
     }
     filedir=filename.GetDirectory().utf8_str();
 
-    list_song->Append(filename.GetFilename());
+    list_song->Append(filename.GetPath());
     list_index++;
     cout <<"File: " << filename.GetPath().utf8_str() << endl;
     add_queue(string(filename.GetPath().utf8_str()));
