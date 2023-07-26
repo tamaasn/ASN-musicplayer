@@ -21,6 +21,7 @@ class Frame: public wxFrame{
         void stop_music(wxCommandEvent &event);
         void pause_music(wxCommandEvent &event);
         void open_playlist(wxCommandEvent &event);
+        void exit_program(wxCommandEvent &event);
         void save_playlist(wxCommandEvent &event);
         
         string get_duration(uint64_t time);

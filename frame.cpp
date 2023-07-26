@@ -41,13 +41,17 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     Bind(wxEVT_MENU , &Frame::open_file , this , open_id);
     Bind(wxEVT_MENU , &Frame::open_playlist , this , open_playlist_id);
     Bind(wxEVT_MENU , &Frame::save_playlist , this , save_playlist_id);
-
+    Bind(wxEVT_MENU , &Frame::exit_program , this , wxID_EXIT);
     this->SetMaxSize(wxSize(345,370));
     this->SetMinSize(wxSize(345,370));
 
     init();
 }
 
+void Frame::exit_program(wxCommandEvent &event){
+    cout << "Closing program..." << endl;
+    this->Close(true);
+}
 
 void Frame::save_playlist(wxCommandEvent &event){
     wxFileDialog filepath(this , _("Save playlist") , "" , "my_playlist.ply" , "Playlist files(*.ply)|*.ply" , wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
