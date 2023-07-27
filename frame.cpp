@@ -191,7 +191,6 @@ void Frame::play_music(wxCommandEvent &event){
     is_playing=false;
     timer->Stop();
     load_iterator();
-    //song_index_played=list_song->GetSelection();
     index_of_music=0;
     pause_button->SetLabel("Pause");
     is_playing=true;
@@ -219,7 +218,6 @@ void Frame::delete_file(wxCommandEvent &event){
     if (index_selected < 0){
         return;
     }
-    //musics.erase(string(list_song->GetString(index_selected)));
     delete_music(index_selected);
     list_song->Delete(index_selected);
 

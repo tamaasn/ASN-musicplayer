@@ -59,13 +59,11 @@ void play(int starting_index){
         total_duration = (int)Mix_MusicDuration(music);
         std::cout << total_duration << std::endl;
         Mix_PlayMusic(music,0);
-        //it++;
         index_of_music++;
     }
 }
 
 void load_iterator(){
-    //it = musics.begin();
     it_end = musics.end();
 }
 
@@ -87,7 +85,6 @@ void add_queue(std::string filename){
 void delete_music(int index){
     if (index_of_music > index){
         index_of_music--;
-        //it--;
     }
    musics.erase(musics.begin()+index); 
    load_iterator();
