@@ -130,6 +130,7 @@ void Frame::stop_music(wxCommandEvent &event){
 
 void Frame::change_duration(wxCommandEvent &event){
     changing_duration=true;
+
 }
 
 
@@ -155,14 +156,11 @@ void Frame::timer_event(wxTimerEvent &event){
                 passed_duration=0;
             }
         }
-
         else{
-            // if duration is changing change the duration
             passed_duration=music_duration->GetValue();
             change_music_duration(passed_duration);
             changing_duration=false;
         }
-        
         music_duration->SetValue(passed_duration);
         passed_duration_label->SetLabel(get_duration(passed_duration));
     }
@@ -183,11 +181,10 @@ void Frame::SliderGetValue(wxCommandEvent &event){
 
 void Frame::play_music(wxCommandEvent &event){
     index_of_music=0;
+    song_index_played=list_song->GetSelection();
+
     if (list_song->GetSelection() < 0){
         song_index_played=0;
-    }
-    else{
-        song_index_played=list_song->GetSelection();
     }
     change_volume(slider->GetValue());
     Mix_HaltMusic();
