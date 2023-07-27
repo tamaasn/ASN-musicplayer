@@ -2,7 +2,6 @@
 
 Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(345,370)){
     wxPanel *panel = new wxPanel(this , -1);
-   // open_button = new wxButton(panel , open_id , _T("Open") , wxPoint(0,5) , wxSize(60,30));
     play_button = new wxButton(panel , play_id, _T("Play") , wxPoint(0,5) , wxSize(60,30));
     stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(60,5) , wxSize(60,30));
     delete_button = new wxButton(panel , delete_id , _T("Delete") , wxPoint(120,5) , wxSize(60,30));
