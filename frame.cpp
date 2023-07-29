@@ -67,7 +67,7 @@ void Frame::save_playlist(wxCommandEvent &event){
 
 
 void Frame::open_playlist(wxCommandEvent &event){
-    wxFileDialog filepath(this , _("Open playlist") , "","","Playlist files (*.ply)|*.ply" , wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    wxFileDialog filepath(this , _("Open playlist") , "","","Playlist files (*.ply)|*.ply" , wxFD_OPEN| wxFD_FILE_MUST_EXIST);
     if (filepath.ShowModal() == wxID_CANCEL){
         return;
     }
@@ -199,17 +199,21 @@ void Frame::play_music(wxCommandEvent &event){
 }
 
 void Frame::open_file(wxCommandEvent &event){
-    wxFileDialog filename(this,_("Select music"),"","","",wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    wxFileDialog filename(this,_("Select music"),"","","",wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST);
     filename.SetDirectory(filedir);
     if (filename.ShowModal()==wxID_CANCEL){
         return;
     }
     filedir=filename.GetDirectory().utf8_str();
-
-    list_song->Append(filename.GetPath());
-    list_index++;
-    cout <<"File: " << filename.GetPath().utf8_str() << endl;
-    add_queue(string(filename.GetPath().utf8_str()));
+    wxArrayString filepaths;
+    filename.GetPaths(filepaths);
+    size_t totalfiles = filepaths.GetCount();
+    cout << "Total files : " << totalfiles << endl;
+    for(size_t i=0;i<totalfiles;i++){
+        cout <<"File: " << filepaths.Item(i) << endl;
+        list_song->Append(filepaths.Item(i));
+        add_queue(string(filepaths.Item(i).utf8_str()));
+    }
 }
 
 void Frame::delete_file(wxCommandEvent &event){
