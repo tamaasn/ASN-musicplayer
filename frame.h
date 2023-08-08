@@ -11,6 +11,7 @@ using namespace std;
 class Frame: public wxFrame{
     public:
         Frame();
+        ~Frame();
     private:
         void SliderGetValue(wxCommandEvent &event);
         void play_music(wxCommandEvent &event);
@@ -23,10 +24,14 @@ class Frame: public wxFrame{
         void open_playlist(wxCommandEvent &event);
         void exit_program(wxCommandEvent &event);
         void save_playlist(wxCommandEvent &event);
+        void next_music(wxCommandEvent &event);
+        void previous_music(wxCommandEvent &event);
         
         string get_duration(uint64_t time);
         string split_string(string text); 
-
+        
+        wxButton *next_button;
+        wxButton *previous_button;
         wxButton *open_button;
         wxButton *play_button;
         wxButton *stop_button;
@@ -59,5 +64,7 @@ class Frame: public wxFrame{
         int pause_id=10;
         int open_playlist_id=11;
         int save_playlist_id=12;
+        int next_id=13;
+        int previous_id=14;
 
 };
