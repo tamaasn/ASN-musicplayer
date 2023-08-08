@@ -192,6 +192,9 @@ void Frame::SliderGetValue(wxCommandEvent &event){
 }
 
 void Frame::play_music(wxCommandEvent &event){
+    timer->Stop();
+    Mix_HaltMusic();
+    is_playing=false;
     index_of_music=0;
     song_index_played=list_song->GetSelection();
 
@@ -199,9 +202,6 @@ void Frame::play_music(wxCommandEvent &event){
         song_index_played=0;
     }
     change_volume(slider->GetValue());
-    Mix_HaltMusic();
-    is_playing=false;
-    index_of_music=0;
     pause_button->SetLabel("Pause");
     is_playing=true;
     paused=false;
@@ -239,5 +239,4 @@ void Frame::delete_file(wxCommandEvent &event){
 
 Frame::~Frame(){
     Mix_HaltMusic();
-    exit(0);
 }

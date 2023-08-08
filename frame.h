@@ -1,3 +1,5 @@
+#ifndef FRAME_H
+#define FRAME_H
 #include <wx/wx.h>
 #include <wx/slider.h>
 #include <vector>
@@ -68,3 +70,4 @@ class Frame: public wxFrame{
         int previous_id=14;
 
 };
+#endif

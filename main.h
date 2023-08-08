@@ -1,5 +1,3 @@
-#ifndef MUSIC_H
-#define MUSIC_H
 #include "frame.h"
 
 class App: public wxApp{
@@ -12,4 +10,3 @@ bool App::OnInit(){
     frame->Show(true);
     return true;
 }
-#endif

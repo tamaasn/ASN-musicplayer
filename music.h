@@ -1,7 +1,6 @@
 #ifndef MUSIC_H
 #define MUSIC_H
 
-
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL.h>
 #include <map>
@@ -90,5 +89,4 @@ void delete_music(int index){
    load_iterator();
     std::cout << "erased\n";
 }
-
 #endif
