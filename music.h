@@ -38,10 +38,8 @@ void play(int starting_index){
             return;
         }
 
-
-
         if (index_of_music < starting_index){
-            index_of_music++;
+            index_of_music = starting_index; 
             return;
         }
 

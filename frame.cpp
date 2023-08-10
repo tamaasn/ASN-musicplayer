@@ -192,8 +192,8 @@ void Frame::SliderGetValue(wxCommandEvent &event){
 }
 
 void Frame::play_music(wxCommandEvent &event){
-    timer->Stop();
     Mix_HaltMusic();
+    timer->Stop();
     is_playing=false;
     index_of_music=0;
     song_index_played=list_song->GetSelection();
