@@ -6,6 +6,8 @@
 #include <fstream>
 #include <locale>
 #include <bits/stdc++.h>
+#include <time.h>
+#include <string.h>
 #include "music.h"
 
 using namespace std;
@@ -28,7 +30,9 @@ class Frame: public wxFrame{
         void save_playlist(wxCommandEvent &event);
         void next_music(wxCommandEvent &event);
         void previous_music(wxCommandEvent &event);
-        
+        void random_music(wxCommandEvent &event);
+        void select_random();
+
         string get_duration(uint64_t time);
         string split_string(string text); 
         
@@ -39,6 +43,9 @@ class Frame: public wxFrame{
         wxButton *stop_button;
         wxButton *pause_button;
         wxButton *delete_button;
+        wxButton *random_button;
+
+
         wxSlider *slider;
         wxSlider *music_duration;
         wxTimer *timer;
@@ -68,6 +75,7 @@ class Frame: public wxFrame{
         int save_playlist_id=12;
         int next_id=13;
         int previous_id=14;
+        int random_id=15;
 
 };
 #endif

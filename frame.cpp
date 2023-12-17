@@ -1,6 +1,8 @@
 #include "frame.h"
 
 Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,450) , wxSize(480,370)){
+    srand(time(NULL));
+    //SDL_Init(SDL_INIT_EVERYTHING);
     wxPanel *panel = new wxPanel(this , -1);
     play_button = new wxButton(panel , play_id, _T("Play") , wxPoint(0,5) , wxSize(60,30));
     stop_button = new wxButton(panel , stop_id , _T("Stop") , wxPoint(60,5) , wxSize(60,30));
@@ -8,6 +10,7 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     pause_button = new wxButton(panel , pause_id , _T("Pause") , wxPoint(180,5),wxSize(60,30));
     previous_button = new wxButton(panel , previous_id , _T("<<") , wxPoint(240,5) , wxSize(60,30));
     next_button = new wxButton(panel , next_id , _T(">>") , wxPoint(300,5) , wxSize(60,30));
+    random_button = new wxButton(panel , random_id , _T("Random : off") , wxPoint(360 , 5) , wxSize(90,30));
     slider = new wxSlider(panel , slider_id , 0,0,100,wxPoint(60,230),wxSize(200,40));
     slider->SetValue(50);
     music_duration = new wxSlider(panel , duration_id,0,0,0,wxPoint(60,280),wxSize(200,40));
@@ -20,7 +23,6 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
 
     menufile = new wxMenu;
     menuothers = new wxMenu;
-
     menufile->Append(open_id , "Open file\tCtrl-O" , "Open file");
     menufile->Append(open_playlist_id , "Open playlist\tCtrl-Shift-O" , "Open playlist");
     menufile->Append(save_playlist_id , "Save playlist\tCtrl-S" , "Save playlist");
@@ -45,19 +47,54 @@ Frame::Frame(): wxFrame(nullptr , wxID_ANY , "ASN Music Player" , wxPoint(950,45
     Bind(wxEVT_MENU , &Frame::exit_program , this , wxID_EXIT);
     Bind(wxEVT_BUTTON , &Frame::next_music , this , next_id);
     Bind(wxEVT_BUTTON , &Frame::previous_music , this , previous_id);
+    Bind(wxEVT_BUTTON , &Frame::random_music , this , random_id);
     this->SetMaxSize(wxSize(480,370));
     this->SetMinSize(wxSize(480,370));
 
     init();
 }
 
+void Frame::select_random(){
+  if (!random_musics.empty()){
+    random_musics.clear();
+  }
+  for(int i=0;i<musics.size();i++){
+    random_musics.push_back(i);
+  }
+
+  for(int i=1;i<musics.size();i++){
+    int j = rand()%i;
+    int x = random_musics[i];
+    random_musics[i]=random_musics[j];
+    random_musics[j]=x;
+  }
+    std::cout << "total musics : " << musics.size() << "\nrandom : " << random_musics.size() << '\n';
+
+}
+
+void Frame::random_music(wxCommandEvent &event){
+  is_random = !is_random;
+  if(!is_random){
+    random_button->SetLabel("Random : off");
+    index_of_music = random_musics[index_of_music-1]+1;
+    random_musics.clear();
+    return;
+  }
+  random_button->SetLabel("Random : on");
+  select_random();
+
+}
+
 void Frame::next_music(wxCommandEvent &event){
+    if (is_random && random_musics.empty()) select_random();
     Mix_HaltMusic();
 }
 
 void Frame::previous_music(wxCommandEvent &event){
+    if (is_random && random_musics.empty()) select_random();
     Mix_HaltMusic();
     index_of_music -= 2;
+    total_played++;
 }
 
 void Frame::exit_program(wxCommandEvent &event){
@@ -67,9 +104,7 @@ void Frame::exit_program(wxCommandEvent &event){
 
 void Frame::save_playlist(wxCommandEvent &event){
     wxFileDialog filepath(this , _("Save playlist") , "" , "my_playlist.ply" , "Playlist files(*.ply)|*.ply" , wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-    if (filepath.ShowModal() == wxID_CANCEL){
-        return;
-    }
+    if (filepath.ShowModal() == wxID_CANCEL) return;
     vector<string>::const_iterator vector_begin;
     ofstream file;
     file.open(filepath.GetPath().utf8_str());
@@ -90,8 +125,17 @@ void Frame::open_playlist(wxCommandEvent &event){
     while (getline(file,files)){
         wxString filename(files);
         string str = string(filename.utf8_str());
-        list_song->Append(files);
-        add_queue(str);
+        char *x;
+        x = strtok((char*)str.c_str() , "/");
+        int length=0;
+        char *filepath[512];
+        while (x != NULL && length < 512){
+          filepath[length] = x;
+          x = strtok(NULL , "/");
+          length++;
+        }
+        list_song->Append(wxString::FromUTF8(filepath[length-1]));
+        add_queue(string(filename.utf8_str()));
     }
 }
 
@@ -101,31 +145,26 @@ string Frame::get_duration(uint64_t time){
     if (time == 0){
         return "0:0:0";
     }
-    int second=time%60;
-    int minute=(time-second)/60;
-    int hour=3600/(time*time);
-    if (minute>=60){
-        minute=minute-60;
-    }
-    if (minute<60){
-        hour=0;
-    }
-    char data[1024];
-    sprintf(data , "%d:%d:%d" , hour , minute , second);
+    long long second=time%60;
+    long long minute=(time-second)/60;
+    long long hour=3600/(time*time);
+    if (minute>=60) minute=minute-60;
+    if (minute<60) hour=0;
+    char data[1024*5];
+    snprintf(data , sizeof(data) , "%llu:%llu:%llu" , hour , minute , second);
     string time_str= string(data);
     return time_str;
 }
 // pause music
 void Frame::pause_music(wxCommandEvent &event){
-    if (Mix_PausedMusic() == 1){
-        paused=false;
+  paused = !paused;  
+  if (Mix_PausedMusic()){
         Mix_ResumeMusic();
         timer->Start(1000);
         pause_button->SetLabel("Pause");
         return;
     }
     pause_button->SetLabel("Resume");
-    paused=true;
     Mix_PauseMusic();
     timer->Stop();
 }
@@ -133,6 +172,7 @@ void Frame::pause_music(wxCommandEvent &event){
 
 void Frame::stop_music(wxCommandEvent &event){
     index_of_music=0;
+    total_played=0;
     is_playing=false;
     Mix_HaltMusic();
     timer->Stop();
@@ -142,14 +182,18 @@ void Frame::stop_music(wxCommandEvent &event){
 
 void Frame::change_duration(wxCommandEvent &event){
     changing_duration=true;
-
 }
 
 
 void Frame::timer_event(wxTimerEvent &event){
-    cout << "Timer on\n";
     if (!Mix_PlayingMusic() && is_playing){
-        play(song_index_played);
+        try{
+          if (random_musics.empty() && is_random) select_random();
+          play(song_index_played);
+        }
+        catch(...){
+          std::cout << "oops\n";
+        }
     }
     if (Mix_PlayingMusic() && passed_duration==0){
         // if music begin
@@ -158,15 +202,12 @@ void Frame::timer_event(wxTimerEvent &event){
         song_index_played=0;
         cout << total_duration << endl;
         music_duration->SetMax(total_duration);
-        list_song->SetSelection(index_of_music-1);
+        list_song->SetSelection(playing_now);
         duration_label->SetLabel(get_duration(total_duration));
     }
     if (is_playing){
         if (!changing_duration){
-            
-            if(passed_duration++ >= total_duration){
-                passed_duration=0;
-            }
+            if(passed_duration++ >= total_duration) passed_duration=0;
         }
         else{
             passed_duration=music_duration->GetValue();
@@ -201,6 +242,7 @@ void Frame::play_music(wxCommandEvent &event){
     if (list_song->GetSelection() < 0){
         song_index_played=0;
     }
+    if (is_random) select_random();
     change_volume(slider->GetValue());
     pause_button->SetLabel("Pause");
     is_playing=true;
@@ -222,7 +264,23 @@ void Frame::open_file(wxCommandEvent &event){
     cout << "Total files : " << totalfiles << endl;
     for(size_t i=0;i<totalfiles;i++){
         cout <<"File: " << filepaths.Item(i) << endl;
-        list_song->Append(filepaths.Item(i));
+        char *filepath[512];
+        int length=0;
+        char *file_;
+        string a = string(filepaths.Item(i).utf8_str());
+        char *x = (char*)a.c_str();
+        file_ = strtok(x , "/");
+        while(file_ != NULL && length < 512){
+          filepath[length] = file_;
+          file_ = strtok(NULL , "/");
+          length++;
+          //printf(">>%s" , file_);
+        }
+        //filename[0]='\0';
+
+       // list_song->Append(filepaths.Item(i));
+        printf("length = %d" , length);
+        list_song->Append(wxString::FromUTF8(filepath[length-1]));
         add_queue(string(filepaths.Item(i).utf8_str()));
     }
 }
@@ -233,7 +291,7 @@ void Frame::delete_file(wxCommandEvent &event){
         return;
     }
     delete_music(index_selected);
-    list_song->Delete(index_selected);
+    list_song->Delete(index_selected);  
 
 }
 
