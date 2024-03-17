@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-Mix_Music *music=NULL;
+Mix_Music *music;
 double total_duration=0;
 int passed_duration=0;
 bool is_playing=false;
@@ -23,7 +23,20 @@ std::vector<int>random_musics;
 
 
 void init(){
-    Mix_OpenAudio(22050,MIX_DEFAULT_FORMAT,2,4096);
+    Mix_Init(MIX_INIT_MP3);
+    Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,4096);
+}
+
+void destroy_music(){
+  Mix_FreeMusic(music);
+  Mix_HaltMusic();
+  Mix_CloseAudio();
+  Mix_Quit();
+  SDL_Quit();
+  musics.clear();
+  std::vector<std::string>().swap(musics);
+  random_musics.clear();
+  std::vector<int>().swap(random_musics);
 }
 
 double get_music_length(const char *filename){
@@ -64,6 +77,7 @@ void play(int starting_index){
 
         passed_duration=0;
         Mix_FreeMusic(music);
+        music=nullptr;
 
         std::cout << music_file << std::endl;
         music = Mix_LoadMUS(music_file.c_str());
